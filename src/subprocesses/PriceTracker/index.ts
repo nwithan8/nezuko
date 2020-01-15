@@ -2,12 +2,12 @@
  * Coded by CallMeKory - https://github.com/callmekory
  * 'It’s not a bug – it’s an undocumented feature.'
  */
-
 import Scraper from '@jonstuebe/scraper'
 import { TextChannel } from 'discord.js'
-import { GeneralDBConfig } from 'typings'
+import { GeneralDBConfig, NezukoMessage } from 'typings'
+
 import { Subprocess } from '../../core/base/Subprocess'
-import database from '../../core/database'
+import { generalConfig } from '../../core/database/database'
 import { CommandManager } from '../../core/managers/CommandManager'
 import { NezukoClient } from '../../core/NezukoClient'
 
@@ -18,9 +18,8 @@ export default class PriceTracker extends Subprocess {
     super(client, {
       name: 'PriceTracker',
       description: 'Checks prices',
-      disabled: false
+      disabled: true
     })
-    this.client = client
   }
 
   public async run() {
@@ -30,9 +29,7 @@ export default class PriceTracker extends Subprocess {
     const checkPrices = async () => {
       this.client.Log.info('Price Tracker', 'Checking for new prices')
 
-      const db = await database.models.GeneralConfig.findOne({
-        where: { id: this.client.config.ownerID }
-      })
+      const db = await generalConfig(this.client.config.ownerID)
       const config = JSON.parse(db.get('config') as string) as GeneralDBConfig
       const { priceTracking } = config
 
@@ -76,7 +73,7 @@ export default class PriceTracker extends Subprocess {
       }
     }
 
-    await checkPrices()
+    setTimeout(checkPrices, 5000)
     setInterval(checkPrices, 60 * 10000)
   }
 }

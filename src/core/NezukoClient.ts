@@ -2,20 +2,20 @@
  * Coded by CallMeKory - https://github.com/callmekory
  * 'It’s not a bug – it’s an undocumented feature.'
  */
-
-import * as config from '../config/config.json'
-
 import { Client, GuildMember, Message } from 'discord.js'
 import { ClientDB, NezukoMessage } from 'typings'
+
+import * as config from '../config/config.json'
+import { guildMemberAdd } from '../events/guildMemberAdd'
+import { guildMemberRemove } from '../events/guildMemberRemove'
+import { messageReactionAdd } from '../events/messageReactionAdd'
+import { messageReactionRemove } from '../events/messageReactionRemove'
+import { database } from './database/database'
 import { CommandManager } from './managers/CommandManager'
 import { ConfigManager } from './managers/ConfigManager'
 import { SubprocessManager } from './managers/SubprocessManager'
 import { Log } from './utils/Logger'
 import { Utils } from './utils/Utils'
-
-import { guildMemberAdd } from '../events/guildMemberAdd'
-import { guildMemberRemove } from '../events/guildMemberRemove'
-import { database } from './database/database'
 
 export class NezukoClient extends Client {
   public config: {
@@ -36,7 +36,7 @@ export class NezukoClient extends Client {
   public serverConfig: any
   public memberConfig: any
   public commandManager: CommandManager
-  public subprocessManager: SubprocessManager | undefined
+  public subprocessManager: SubprocessManager
 
   constructor() {
     super()
@@ -44,8 +44,6 @@ export class NezukoClient extends Client {
     this.config = config
     this.Log = Log
     this.Utils = Utils
-
-    this.commandManager = new CommandManager(this)
 
     this.db = {}
     this.generalConfig = database.models.GeneralConfig
@@ -60,8 +58,8 @@ export class NezukoClient extends Client {
     })
 
     // Unhandled Promise Rejections
-    process.on('unhandledRejection', (reason) => {
-      this.Log.error('Unhandled Rejection', reason)
+    process.on('unhandledRejection', (reason: any) => {
+      this.Log.error('Unhandled Rejection', reason.stack)
     })
     // Unhandled Errors
     process.on('uncaughtException', (error) => {
@@ -72,36 +70,34 @@ export class NezukoClient extends Client {
   /**
    * Starts Nezuko
    */
-  public start() {
+  public async start() {
     // Login
-    this.login(this.config.token)
+    await this.login(this.config.token)
+    Log.ok('Nezuko Ready', `Username is [ ${this.user.tag} ]`)
+    await this.user.setActivity(`${config.prefix}`, { type: 'LISTENING' })
 
-    // Once bot connects to discord
-    this.once('ready', async () => {
-      Log.ok('Client Ready', `Connected as [ ${this.user.username} ]`)
+    // * ----------  start subprocess and command managers ----------
 
-      // Handle general config
-      ConfigManager.handleGeneralConfig()
+    this.commandManager = new CommandManager(this)
+    this.subprocessManager = new SubprocessManager(this)
 
-      // * ---------- Events ----------
+    // Handle general config
 
-      // On message
-      this.on(
-        'message',
-        async (message: NezukoMessage) =>
-          await this.commandManager.handleMessage(message, this, true)
-      )
+    ConfigManager.handleGeneralConfig()
 
-      // On message edits
-      this.on('messageUpdate', async (old: Message, _new: NezukoMessage) => {
-        if (old.content !== _new.content) await this.commandManager.handleMessage(_new, this)
-      })
+    // * ---------- Events ----------
 
-      this.on('guildMemberAdd', async (member: GuildMember) => await guildMemberAdd(member))
-      this.on('guildMemberRemove', async (member: GuildMember) => await guildMemberRemove(member))
+    // On message
+    this.on('message', async (message: NezukoMessage) => await this.commandManager.handleMessage(message, this, true))
 
-      // * ---------- Load and start subprocessess ----------
-      await new SubprocessManager(this).loadModules()
+    // On message edits
+    this.on('messageUpdate', async (old: Message, _new: NezukoMessage) => {
+      if (old.content !== _new.content) await this.commandManager.handleMessage(_new, this)
     })
+
+    this.on('guildMemberAdd', async (member: GuildMember) => await guildMemberAdd(member))
+    this.on('guildMemberRemove', async (member: GuildMember) => await guildMemberRemove(member))
+    this.on('messageReactionAdd', async (reaction, user) => await messageReactionAdd(reaction, user))
+    this.on('messageReactionRemove', async (reaction) => await messageReactionRemove(reaction))
   }
 }

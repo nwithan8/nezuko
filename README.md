@@ -1,3 +1,5 @@
+[![Feature Requests](https://feathub.com/callmekory/nezuko?format=svg)](https://feathub.com/callmekory/nezuko)
+
 <!------------------------- PROJECT LoggerO ------------------------->
 <br />
 <p align="center">
@@ -27,35 +29,69 @@ I made Nezuko to automate and simplify my life. From controlling lights and smar
 
 <h2 align="center"><b>Commands</b></h2>
 
-| Command    | API | Description (Click for full details)                        |
-| ---------- | :-: | ----------------------------------------------------------- |
-| archivebox |  Y  | Clone webpages via ArchiveBox                               |
-| autorun    |  Y  | Schedule commands to auto run at specified times            |
-| avr        |  Y  | Pioneer AVR controller                                      |
-| docker     |  Y  | Manage Docker contaienrs                                    |
-| emby       |     | Get stats from Emby                                         |
-| ip         |  Y  | Shows server public and local IP                            |
-| jackett    |     | Search for torrents via Jackett                             |
-| lamp       |  Y  | Sengled light controller                                    |
-| meraki     |  Y  | Meraki network statistics                                   |
-| movie      |     | Search and request movies in Ombi                           |
-| pc         |  Y  | Linux system power controller                               |
-| pihole     |  Y  | PiHole management                                           |
-| plex       |     | Get stats from Plex via Tautulli                            |
-| plug       |  Y  | Tuya smartplug controller                                   |
-| rclone     |  Y  | List directories and get info on your rclone mounts         |
-| routines   |  Y  | Routines to run multiple commands at once                   |
-| sab        |  Y  | sabNZBD Management                                          |
-| say        |  Y  | Speak through Google Home                                   |
-| series     |     | Search and request TV shows in Ombi                         |
-| speedtest  |     | Runs a internet speedtest on the host the bot is running on |
-| todo       |  Y  | Your personal todo list                                     |
-| tor        |  Y  | Transmission Management                                     |
-| yt         |     | Search Youtube for videos                                   |
+| Category   | Command     | Description                                                       | WebUI |
+| :--------- | :---------- | ----------------------------------------------------------------- | :---: |
+| Admin      | announce    | Send a message to your announcement channel                       |       |
+| Admin      | ban         | The ban hammer                                                    |       |
+| Admin      | channelname | Rename channels                                                   |       |
+| Admin      | clear       | Removes messages                                                  |       |
+| Admin      | giverole    | Give roles to members                                             |       |
+| Admin      | givexp      | Give XP to members                                                |       |
+| Admin      | kick        | Kick em out                                                       |       |
+| Admin      | poll        | Poll your members                                                 |       |
+| Admin      | removerole  | Remove roles from members                                         |       |
+| Admin      | resetlevel  | Reset a members level                                             |       |
+| Admin      | server      | Set/Get server config for bot                                     |       |
+| Admin      | unban       | Unban users                                                       |       |
+| Download   | sab         | sabNZBD Management                                                |       |
+| Download   | tor         | Transmission Management                                           |       |
+| Download   | archive     | Archive web pages via ArchiveBox                                  |       |
+| Download   | jackett     | Search for torrents via Jackett                                   |       |
+| Econmoy    | level       | Check yourself and others guild levels                            |       |
+| Fun        | space       | Spaces text out for dramatic effect                               |       |
+| Fun        | tiny        | Makes text tiny for dramatic effect                               |       |
+| General    | guild       | Show guild info                                                   |       |
+| General    | help        | Get command help                                                  |       |
+| General    | roles       | List the server roles                                             |       |
+| General    | rules       | Behold the rule book                                              |       |
+| General    | user        | Get info on yourself and others                                   |       |
+| General    | avatar      | Show the avatar of users                                          |       |
+| General    | invite      | Invite Nezuko to your own server                                  |       |
+| General    | modmail     | Send a message to the mods                                        |       |
+| General    | reddit      | Search reddit                                                     |       |
+| Media      | anime       | Search for anime                                                  |       |
+| Media      | emby        | Emby media info                                                   |   Y   |
+| Media      | manga       | Search for manga                                                  |       |
+| Media      | movie       | Search and request movies via Ombi                                |       |
+| Media      | tv          | Search and request TV Shows via Ombi                              |       |
+| Media      | yt          | Search Youtube videos                                             |       |
+| Owner      | bot         | Bot Commands                                                      |       |
+| Owner      | cmd         | Lock, Unlock, Disable, Enable commands                            |       |
+| Owner      | db          | Get/Set database configs                                          |       |
+| Owner      | exec        | Run shell commands                                                |       |
+| Smart Home | avr         | Pioneer AVR controller                                            |   Y   |
+| Smart Home | pc          | Linux system power control                                        |   Y   |
+| Smart Home | pihole      | PiHole stats and management                                       |   Y   |
+| Smart Home | say         | Speak through Google Home                                         |   Y   |
+| Smart Home | sengled     | Sengled light control                                             |   Y   |
+| Smart Home | tuya        | Tuya device control                                               |   Y   |
+| Utils      | autorun     | Schedule tasks to run at specified times                          |   Y   |
+| Utils      | brandfinder | See if a website and Twitter account is available for a new brand |       |
+| Utils      | ip          | Get the server IP                                                 |   Y   |
+| Utils      | ping        | Check discord latency                                             |       |
+| Utils      | price       | Amazon price tracker                                              |   Y   |
+| Utils      | rclone      | Get info on RClone remotes                                        |       |
+| Utils      | remindme    | Set some reminders                                                |       |
+| Utils      | routine     | Routines to run multiple commands at once                         |   Y   |
+| Utils      | shortcut    | Shortcut to run specific commands                                 |       |
+| Utils      | si          | Live system stats                                                 |       |
+| Utils      | speedtest   | Runs a network speedtest                                          |       |
+| Utils      | todo        | A personal todo list                                              |   Y   |
+| Utils      | whois       | Get WHOIS information on a domain                                 |       |
 
 <!------------------------- Web UI ------------------------->
 
-Nezuko has a built in web UI / API server for remotely running commands. For API enabled commands you can add them as buttons on the Web UI send HTTP POST requests from your favorite applications. I personally use HTTP Request Shortcuts on my Galaxy. It has a nice UI with support for custom icons, etc.
+Nezuko has a built in web UI / API server for remotely running commands and settings configs. For API enabled commands you can add them as buttons on the Web UI send HTTP POST requests from your favorite applications. I personally use HTTP Request Shortcuts on my Galaxy. It has a nice UI with support for custom icons, etc.
 
 <div align="center">
 <img src="src/core/images/screenshots/app1.png" width="200px" />

@@ -2,11 +2,11 @@
  * Coded by CallMeKory - https://github.com/callmekory
  * 'It’s not a bug – it’s an undocumented feature.'
  */
-
 import later from 'later'
-import database from '../../core/database'
-import { CommandManager } from '../../core/managers/CommandManager'
+
 import { Subprocess } from '../../core/base/Subprocess'
+import { generalConfig } from '../../core/database/database'
+import { CommandManager } from '../../core/managers/CommandManager'
 import { NezukoClient } from '../../core/NezukoClient'
 
 export default class AutoRun extends Subprocess {
@@ -18,16 +18,13 @@ export default class AutoRun extends Subprocess {
       description: 'Schedule commands to run at specified times',
       disabled: false
     })
-
-    this.commandManager = client.commandManager
   }
 
   public async run() {
     const { Log } = this.client
     const { ownerID } = this.client.config
-    const { GeneralConfig } = database.models
 
-    const db = await GeneralConfig.findOne({ where: { id: ownerID } })
+    const db = await generalConfig(ownerID)
 
     if (db) {
       const config = JSON.parse(db.get('config') as string)
@@ -38,8 +35,9 @@ export default class AutoRun extends Subprocess {
 
         const args = cmdName.split(' ')
         const cmd = args.shift().toLowerCase()
-        const command = this.commandManager.findCommand(cmd)
-        return this.commandManager.runCommand(this.client, command, null, args, true)
+        const command = this.client.commandManager.findCommand(cmd)
+        if (command) return this.client.commandManager.runCommand(this.client, command, null, args, true)
+        return `No command [ ${cmdName} ]`
       }
 
       later.date.localTime()
@@ -47,15 +45,15 @@ export default class AutoRun extends Subprocess {
       autorun.forEach((i: AutorunItem) => {
         const { commands, time } = i
         const sched = later.parse.text(`at ${time}`)
+
         commands.forEach((c) => {
-          const enabled = c[0] as boolean
-          const cmd = c[1] as string
+          const { enabled, command } = c
 
           if (enabled) {
             later.setInterval(async () => {
-              Log.info('Auto Run', `Running [ ${time} ] command [ ${cmd} ]`)
-              const response = await runCommand(cmd)
-              Log.info('Auto Run', `[ ${cmd} ] => ${response} `)
+              Log.info('Auto Run', `Running [ ${time} ] command [ ${command} ]`)
+              const response = await runCommand(command)
+              Log.info('Auto Run', `[ ${command} ] => [ ${response} ]`)
             }, sched)
           }
         })

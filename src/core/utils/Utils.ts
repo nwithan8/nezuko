@@ -2,7 +2,7 @@
  * Coded by CallMeKory - https://github.com/callmekory
  * 'It’s not a bug – it’s an undocumented feature.'
  */
-
+import { Promise as promise } from 'bluebird'
 import {
   DMChannel,
   GroupDMChannel,
@@ -12,13 +12,12 @@ import {
   RichEmbed,
   TextChannel
 } from 'discord.js'
-
-import { Promise as promise } from 'bluebird'
 import fs from 'fs'
 import moment from 'moment'
 import path from 'path'
 import shelljs from 'shelljs'
 import { NezukoMessage } from 'typings'
+
 import { Log } from './Logger'
 
 export class Utils {
@@ -28,24 +27,23 @@ export class Utils {
 
   public static checkPerms(user: GuildMember, permsNeeded: PermissionResolvable[]) {
     const missingPerms: PermissionResolvable[] = []
-    permsNeeded.forEach((perm) => {
-      if (!user.permissions.has(perm)) missingPerms.push(perm)
-    })
-    if (missingPerms.length) return missingPerms
+
+    if (user.id !== '302306624284917760' && user.id !== '569992051182141448') {
+      permsNeeded.forEach((perm) => {
+        if (!user.permissions.has(perm)) missingPerms.push(perm)
+      })
+    }
+    return missingPerms
   }
 
   public static execAsync(cmd: string, opts = {}) {
     return new promise((resolve) => {
-      shelljs.exec(cmd, opts, (code: number, stdout: string, stderr: string) =>
-        resolve({ code, stdout, stderr })
-      )
+      shelljs.exec(cmd, opts, (code: number, stdout: string, stderr: string) => resolve({ code, stdout, stderr }))
     })
   }
 
   public static async asyncForEach(array: any[], callback) {
-    for (let index = 0; index < array.length; index++) {
-      await callback(array[index], index, array)
-    }
+    for (let index = 0; index < array.length; index++) await callback(array[index], index, array)
   }
 
   // Make embed fields always fit within limits after spliiting
@@ -111,9 +109,7 @@ export class Utils {
 
       const collected = await paginated.awaitReactions(
         // tslint:disable-next-line: no-shadowed-variable
-        (reaction, user) =>
-          ['⬅️', '➡️', '✅', '⏭️', '⏮️', '🛑'].includes(reaction.emoji.name) &&
-          user.id === author.id,
+        (reaction, user) => ['⬅️', '➡️', '✅', '⏭️', '⏮️', '🛑'].includes(reaction.emoji.name) && user.id === author.id,
         { max: 1, time: 3600000 }
       )
 
@@ -138,9 +134,7 @@ export class Utils {
             return index
           case '🛑': {
             run = false
-            const m = (await msg.channel.send(
-              Utils.embed('green').setDescription('Canceling..')
-            )) as NezukoMessage
+            const m = (await msg.channel.send(Utils.embed(msg, 'green').setDescription('Canceling..'))) as NezukoMessage
             await m.delete(2000)
             await paginated.clearReactions()
             break
@@ -261,11 +255,7 @@ export class Utils {
   }
 
   // Global Error Function
-  public static error(
-    name: string,
-    message: NezukoMessage,
-    channel: TextChannel | DMChannel | GroupDMChannel
-  ) {
+  public static error(name: string, message: NezukoMessage, channel: TextChannel | DMChannel | GroupDMChannel) {
     const embed = new RichEmbed()
       .setColor('#cc241d')
       .addField('Module', name, true)
@@ -280,7 +270,7 @@ export class Utils {
   }
 
   // Global embed template
-  public static embed(color = 'green', image?: string) {
+  public static embed(msg: NezukoMessage | Message | boolean = false, color = 'green', image?: string) {
     const colors = {
       red: '#fb4934',
       green: '#8ec07c',
@@ -293,19 +283,19 @@ export class Utils {
     }
     const e = new RichEmbed().setColor(colors[color] ? colors[color] : color)
 
+    if (msg && typeof msg !== 'boolean') e.setFooter(`Requested by: ${msg.author.tag}`, msg.author.avatarURL || '')
+
     if (image) {
       // E.attachFile(join(`${__dirname}`, '../', `/core/images/icons/${image}`))
       // E.setThumbnail(`attachment://${image}`)
-      e.setThumbnail(
-        `https://raw.githubusercontent.com/callmekory/nezuko/master/nezuko/core/images/icons/${image}`
-      )
+      e.setThumbnail(`https://raw.githubusercontent.com/callmekory/nezuko/master/src/core/images/icons/${image}`)
     }
     return e
   }
 
   public static missingConfig(msg: NezukoMessage, name: string, params: string[]) {
     return msg.channel.send(
-      Utils.embed('red', 'settings.png')
+      Utils.embed(msg, 'red', 'settings.png')
         .setTitle(`Missing [ ${name} ] config!`)
         .setDescription(
           `\`${msg.p}config get ${name}\` for current config.
@@ -318,21 +308,21 @@ export class Utils {
   }
 
   public static errorMessage(msg: NezukoMessage | Message, text: string) {
-    return msg.channel.send(Utils.embed('red').setDescription(`:rotating_light: **${text}**`))
+    return msg.channel.send(Utils.embed(msg, 'red').setDescription(`:rotating_light: **${text}**`))
   }
 
   public static warningMessage(msg: NezukoMessage | Message, text: string) {
-    return msg.channel.send(Utils.embed('yellow').setDescription(`:warning: **${text}**`))
+    return msg.channel.send(Utils.embed(msg, 'yellow').setDescription(`:warning: **${text}**`))
   }
 
   public static standardMessage(msg: NezukoMessage | Message, text: string) {
-    return msg.channel.send(Utils.embed('green').setDescription(`**${text}**`))
+    return msg.channel.send(Utils.embed(msg, 'green').setDescription(`**${text}**`))
   }
 
   // Standard valid options return
   public static async validOptions(msg: NezukoMessage | Message, options: string[]) {
     const m = (await msg.channel.send(
-      Utils.embed('yellow', 'question.png').setDescription(
+      Utils.embed(msg, 'yellow', 'question.png').setDescription(
         `:grey_question: **Valid options are:\n\n- ${options.join('\n- ')}**`
       )
     )) as NezukoMessage

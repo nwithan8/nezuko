@@ -2,7 +2,6 @@
  * Coded by CallMeKory - https://github.com/callmekory
  * 'It’s not a bug – it’s an undocumented feature.'
  */
-
 import { NezukoClient } from '../NezukoClient'
 
 export class Subprocess {
@@ -31,7 +30,7 @@ export class Subprocess {
   /**
    * Runs subprocess
    */
-  public run() {
+  public async run() {
     throw new Error('Missing Run Method')
   }
 }

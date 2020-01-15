@@ -2,12 +2,10 @@
  * Coded by CallMeKory - https://github.com/callmekory
  * 'It’s not a bug – it’s an undocumented feature.'
  */
-
-import * as config from '../../config/config.json'
-
 import { Guild } from 'discord.js'
 import { NezukoMessage } from 'typings'
-import database from '../database'
+import * as config from '../../config/config.json'
+import { database, generalConfig } from '../database/database'
 import { Log } from '../utils/Logger'
 
 /**
@@ -20,7 +18,7 @@ export class ConfigManager {
   public static async handleGeneralConfig() {
     await database.sync()
     const { ownerID } = config
-    const db = await database.models.GeneralConfig.findOne({ where: { id: ownerID } })
+    const db = await generalConfig(ownerID)
 
     if (!db) {
       Log.info('Config Manager', `Created new general config for [ ${ownerID} ]`)
@@ -73,10 +71,7 @@ export class ConfigManager {
     })
 
     if (!db) {
-      Log.info(
-        'Config Manager',
-        `Creating new server config for guild ID [ ${guild.id} ] [ ${guild.name} ]`
-      )
+      Log.info('Config Manager', `Creating new server config for guild ID [ ${guild.id} ] [ ${guild.name} ]`)
       db = await database.models.ServerConfig.create({
         id,
         ownerID,
@@ -91,6 +86,7 @@ export class ConfigManager {
           welcomeChannel: null,
           levelUpMessage: 'Welcome to level {level}'
         }),
+        levelMultiplier: '2',
         memberLevels: JSON.stringify({
           levelRoles: [],
           levels: {}
